@@ -1,0 +1,6 @@
+@Serviço.Estoque_HostAddress = http://localhost:5082
+
+GET {{Serviço.Estoque_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
