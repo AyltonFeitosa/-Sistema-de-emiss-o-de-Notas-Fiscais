@@ -42,7 +42,7 @@ namespace Serviço.Estoque.Controllers
 
             if(result > 0)
             {
-                return CreatedAtAction(nameof(GetById), new { id = produto.UniqueId }, produto);return
+                return CreatedAtAction(nameof(GetById), new { id = produto.UniqueId }, produto);
             }
 
             else
@@ -50,6 +50,14 @@ namespace Serviço.Estoque.Controllers
                 return BadRequest();
             }
 
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteAllAsync()
+        {
+            var result = await _context.Produtos.ExecuteDeleteAsync();
+
+            return Ok();
         }
 
     }
