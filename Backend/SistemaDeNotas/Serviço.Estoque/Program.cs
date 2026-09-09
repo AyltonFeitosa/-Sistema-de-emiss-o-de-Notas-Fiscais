@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Serviço.Estoque.Data;
+using Serviço.Estoque.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();   
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<RabbitMqConsumer>();
+
 
 var app = builder.Build();
 
