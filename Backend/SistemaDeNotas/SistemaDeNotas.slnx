@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="Serviço.Estoque/Serviço.Estoque.csproj" />
-  <Project Path="Serviço.Faturamento/Serviço.Faturamento.csproj" />
+  <Project Path="D:/workspace/1.Sistema de Notas/Backend/SistemaDeNotas/Serviço.Estoque/Serviço.Estoque.csproj" />
+  <Project Path="D:/workspace/1.Sistema de Notas/Backend/SistemaDeNotas/Serviço.Faturamento/Serviço.Faturamento.csproj" />
+  <Project Path="D:/workspace/1.Sistema de Notas/Backend/SistemaDeNotas/Serviço.Model/Serviço.Model.csproj" Id="3354057a-db62-404a-aaba-5ebf51bbd9a7" />
 </Solution>
