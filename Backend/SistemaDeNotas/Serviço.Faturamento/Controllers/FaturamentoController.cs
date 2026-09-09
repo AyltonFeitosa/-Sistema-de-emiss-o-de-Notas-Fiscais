@@ -3,6 +3,8 @@ using Serviço.Faturamento.Data;
 using Serviço.Faturamento.Enum;
 using Serviço.Faturamento.Messaging;
 using Serviço.Faturamento.Models;
+using Serviço.Model.Dtos;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Serviço.Faturamento.Controllers
 {
@@ -21,8 +23,7 @@ namespace Serviço.Faturamento.Controllers
         [HttpPost]
         public async Task<ActionResult<NotaFiscal>> SaveAsync(NotaFiscal nota)
         {
-
-            string test = "olá";
+            var test = "blablabla";
 
             await _rabbitMq.PublishMessageAsync(test);
 
@@ -42,6 +43,39 @@ namespace Serviço.Faturamento.Controllers
             {
                 return BadRequest("ERROR: Falha ao salvar nota.");
             }
+        }
+
+        [HttpPost("print/{id}")]
+        public async Task<ActionResult<BaixaEstoqueMensagem>> PrintAsync(int id)
+        {
+            var nota = await _context.Notas_Fiscais.FindAsync(id);
+            if(nota == null)            
+                return BadRequest();
+
+            if (nota.Status != StatusEnum.Aberta)
+                return BadRequest("Status Inválido");
+
+            var idProducts = new List<string>();
+
+            foreach(var idProduct in nota.Itens)
+            {
+                idProducts.Add(idProduct.ProdutoId);
+            }
+
+            var baixarEstoque = new BaixaEstoqueMensagem
+            {
+                NotaFiscalId = id,
+                Itens = new List<ItemBaixaDto>
+                {
+                    new ItemBaixaDto {ProdutoId = 1, Quantidade = 5},
+                    new ItemBaixaDto {ProdutoId = 2, Quantidade = 10}
+                }
+            };
+
+            await _rabbitMq.PublishMessageAsync(baixarEstoque);
+
+            return Ok();
+
         }
     }
 }
