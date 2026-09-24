@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Serviço.Estoque.Models
+namespace Serviço.Model.Dtos
 {
     public class Produto
     {

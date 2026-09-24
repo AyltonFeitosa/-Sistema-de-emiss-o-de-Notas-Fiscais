@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Serviço.Estoque.Models;
+using Serviço.Model.Dtos;
+
 
 namespace Serviço.Estoque.Data
 {

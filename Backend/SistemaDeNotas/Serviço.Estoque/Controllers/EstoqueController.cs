@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serviço.Estoque.Data;
-using Serviço.Estoque.Models;
+using Serviço.Model.Dtos;
 
 namespace Serviço.Estoque.Controllers
 {
@@ -37,12 +37,14 @@ namespace Serviço.Estoque.Controllers
         [HttpPost]
         public async Task<ActionResult<Produto>> SaveAsync(Produto produto)
         {
+
+            produto.UniqueId = Guid.NewGuid().ToString();
             _context.Produtos.Add(produto);
             var result = await _context.SaveChangesAsync();
 
             if(result > 0)
             {
-                return CreatedAtAction(nameof(GetById), new { id = produto.UniqueId }, produto);
+                return Ok(produto);
             }
 
             else

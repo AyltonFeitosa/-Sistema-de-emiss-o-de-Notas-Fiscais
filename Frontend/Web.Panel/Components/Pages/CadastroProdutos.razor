@@ -1,0 +1,187 @@
+@page "/produtos"
+@using Serviço.Model.Dtos
+@using Web.Panel.Services
+
+<PageTitle>Cadastro de Produtos</PageTitle>
+
+@inject EstoqueService estoqueService
+
+<div class="page-wrapper">
+    <div class="page-container">
+        <!-- Card de Cadastro -->
+        <div class="main-card">
+            <div class="header-section">
+                <h1 class="title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    Cadastro de Produto
+                </h1>
+                <p class="subtitle">Preencha os dados abaixo para registrar um novo item no estoque.</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(mensagemSucesso))
+            {
+                <div class="alert alert-success">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>@mensagemSucesso</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(mensagemErro))
+            {
+                <div class="alert alert-error">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>@mensagemErro</span>
+                </div>
+            }
+
+            <div>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label class="form-label" for="descricao">Nome do Produto</label>
+                        <input id="descricao" class="form-input" type="text" placeholder="Ex: Monitor Gamer 27 Polegadas 144Hz" @bind="descricao" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="saldo">Saldo em Estoque</label>
+                        <input id="saldo" class="form-input" type="number" min="0" placeholder="0" @bind="saldo" />
+                    </div>
+
+                </div>
+
+
+
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" @onclick="LimparCampos">
+                        Limpar
+                    </button>
+                    <button type="button" class="btn btn-primary" @onclick="CadastrarProduto">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Cadastrar Produto
+                    </button>
+                    <button type="button" class="btn btn-primary" @onclick="GetAllProducts">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Buscar Produtos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Produtos Cadastrados -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2 class="table-title">Produtos Cadastrados</h2>
+                <span class="badge-count">@produtos.Count @(produtos.Count == 1 ? "item" : "itens")</span>
+            </div>
+
+            @if (produtos.Count == 0)
+            {
+                <div class="empty-state">
+                    Nenhum produto cadastrado ainda. Preencha o formulário acima.
+                </div>
+            }
+            else
+            {
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Código</th>
+                            <th>Descrição</th>
+                            <th style="text-align: right; width: 20%;">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var prod in produtos)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="code-badge">@prod.UniqueId[..8]</span>
+                                </td>
+                                <td>
+                                    <strong>@prod.Description</strong>
+                                </td>
+                                <td style="text-align: right;">
+                                    <span class="balance-pill @(prod.Balance == 0 ? "balance-zero" : "")">
+                                        @prod.Balance un
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string codigo = string.Empty;
+    private string descricao = string.Empty;
+    private int saldo = 0;
+    private string? mensagemSucesso;
+    private string? mensagemErro;
+
+    private List<Produto> produtos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await GetAllProducts();
+        produtos = result;
+    }
+
+    private async Task CadastrarProduto()
+    {
+        mensagemSucesso = null;
+        mensagemErro = null;
+
+        if (saldo < 0)
+        {
+            mensagemErro = "O saldo não pode ser negativo.";
+            return;
+        }
+
+        var produto = new Produto
+            {
+                Description = descricao,
+                Balance = saldo
+            };
+
+        var result = await estoqueService.SaveAsync(produto);
+        if(result != null)
+        {
+            mensagemSucesso = $"Produto '{descricao.Trim()}' cadastrado com sucesso!";
+            produtos.Add(produto);            
+        }
+        StateHasChanged();
+        LimparCampos();
+    }
+
+    private void LimparCampos()
+    {
+        codigo = string.Empty;
+        descricao = string.Empty;
+        saldo = 0;
+    }
+
+    private async Task<List<Produto>> GetAllProducts()
+    {
+        var result = await estoqueService.GetAllProductsAsync();
+        return result;
+    }
+}
